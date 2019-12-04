@@ -17,7 +17,7 @@ import httplib2
 import requests
 import json
 from collections import OrderedDict
-import csv, json
+import csv, json, re
 
 
 class DataCrawler:
@@ -183,8 +183,8 @@ class DataCrawler:
                 break
 
     def create_csv(self, data):
-        if os.path.exists("data.csv"): os.remove("data.csv")
-        with open("data.csv",mode='a',newline='') as output_file:
+        # if os.path.exists("data.csv"): os.remove("data.csv")
+        with open(self.industry[:5],mode='a',newline='') as output_file:
             output_writer = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             output_writer.writerow(["Name","Email", "Role","Company","Industry","Country"])
             for each in data:
