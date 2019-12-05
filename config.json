@@ -1,14 +1,10 @@
 {
     "criteria": [
         {
-            "country": "United Arab Emirates",
-            "industry": "Airlines/Aviation",
-            "company_size": "G"
-        },
-        {
             "country": "United Kingdom",
             "industry": "Capital Markets",
-            "company_size": "G"
+            "company_size": "G",
+            "list_name":"cfo and ceo only"
         }
     ]
 }

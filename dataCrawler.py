@@ -41,10 +41,10 @@ class DataCrawler:
         driver.find_element_by_id("email").send_keys(self.login)
         driver.find_element_by_id("password").send_keys(self.password)
         driver.find_element_by_id("buttonFormLogin").click()
-        driver.get("https://app.snov.io/company-profile-search")
         print("logged in successfully")
 
     def company_profile_search(self):
+        driver.get("https://app.snov.io/company-profile-search")
         while True:
             try:
                 WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.ID,"company-block")))
@@ -138,7 +138,7 @@ class DataCrawler:
         time.sleep(4)
         status=False
         l_page=''
-        roles=["cfo","ceo","chief executive officer","chief financial officer"]
+        roles=["cfo","ceo","controller","chief executive officer","chief financial officer"]
         while True:
             try:
                 table = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.table-flex.columns_4")))
@@ -161,7 +161,6 @@ class DataCrawler:
                             status=True
                     except:
                         pass
-
                 if status:
                     try:
                         add_t0 = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.app-dropdown")))
@@ -170,8 +169,10 @@ class DataCrawler:
                         add_to_list = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"ul.style-scroll")))
                         lists = add_to_list.find_elements_by_tag_name("li")
                         if lists:
-                            self.list_name= lists[-1].find_element_by_tag_name("a").text
-                            lists[-1].click()
+                            for x in lists:
+                                get_list_name = x.find_element_by_tag_name("a").text
+                                if get_list_name == self.list_name:
+                                    x.click()
                             time.sleep(4)
                     except:
                         pass
@@ -183,15 +184,15 @@ class DataCrawler:
                 break
 
     def create_csv(self, data):
-        file_name = "".join(re.findall("[a-zA-Z]+",self.industry))
-        if os.path.exists(file_name): os.remove(file_name)
-        with open(file_name,mode='a',newline='') as output_file:
+        # file_name = "".join(re.findall("[a-zA-Z]+",self.industry))
+        if os.path.exists(self.list_name+".csv"): os.remove(self.list_name+".csv")
+        with open(self.list_name+".csv",mode='a',newline='') as output_file:
             output_writer = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            output_writer.writerow(["Name","Email", "Role","Company","Industry","Country"])
+            output_writer.writerow(["Name","Email", "Role","Company","Industry","Country","Social"])
             for each in data:
                 try:
                     if each['industry']==self.industry:
-                        output_writer.writerow([each['name'], each['email'], each['role'], each['company'], each['industry'], each['country'] ])
+                        output_writer.writerow([each['name'], each['email'], each['role'], each['company'], each['industry'], each['country'] ,each['social']])
                 except:
                     pass
 
@@ -211,13 +212,15 @@ class DataCrawler:
                 company=''
             tbl = driver.find_element_by_css_selector("table.table-text-info")
             rows = tbl.find_elements_by_tag_name("tr")
-            email= ''
+            email= social=''
             for x in rows:
                 col = x.find_elements_by_tag_name("td")
                 if col:
                     if "emails" in col[0].text.lower():
                         email = col[1].find_element_by_css_selector("span.email-item").text
-            return {"name":name,"role":role,"company":company, "industry":self.industry,"country":self.country,"email":email}
+                    if "social" in col[0].text.lower():
+                        social=col[1].find_element_by_css_selector("a.social").get_attribute("href")
+            return {"name":name,"role":role,"company":company, "industry":self.industry,"country":self.country,"email":email, "social":social}
         except:
             pass
             return {}
@@ -269,10 +272,31 @@ class DataCrawler:
                     item_name = x.find_element_by_css_selector("span.sidebar-item-name").text
                     if item_name==self.list_name:
                         item_link=x.find_element_by_tag_name("a").get_attribute("href")
+                        break
             return item_link
         except Exception:
             print("error while getting list link")
             return ''
+
+    def create_list(self):
+        print("Creating list...")
+        is_list_exist = self.go_to_list()
+        if not is_list_exist:
+            try:
+                add_list = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"a.styled-button.minimize")))
+                add_list.click()
+                modal = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div#itemsModal")))
+                feild = modal.find_element_by_name("name")
+                ActionChains(driver).move_to_element(feild).perform()
+                ActionChains(driver).send_keys(self.list_name).perform()
+                ActionChains(driver).send_keys(Keys.ENTER).perform()
+                time.sleep(3)
+                print("list created successfully")
+            except Exception:
+                print("error while getting list link")
+        else:        
+            print("list already exist")
+
 
     def main(self):
         data=[]
@@ -283,6 +307,8 @@ class DataCrawler:
             self.country = x['country']
             self.industry = x['industry']
             self.range = x['company_size']
+            self.list_name = x['list_name']
+            self.create_list()
             print(f"\nSearching Criteria is::\n\nCountry:::::: {self.country}\nIndustry::::::::: {self.industry}\nCompany_Size::::::: {self.range}")
             print("\nAdding criteria")
             self.company_profile_search()
