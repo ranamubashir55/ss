@@ -138,7 +138,7 @@ class DataCrawler:
         time.sleep(4)
         status=False
         l_page=''
-        roles=["cfo","controller","ceo","chief executive officer","chief financial officer"]
+        roles=["cfo","ceo","chief executive officer","chief financial officer"]
         while True:
             try:
                 table = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.table-flex.columns_4")))
@@ -183,13 +183,15 @@ class DataCrawler:
                 break
 
     def create_csv(self, data):
-        # if os.path.exists("data.csv"): os.remove("data.csv")
-        with open(self.industry[:5],mode='a',newline='') as output_file:
+        file_name = "".join(re.findall("[a-zA-Z]+",self.industry))
+        if os.path.exists(file_name): os.remove(file_name)
+        with open(file_name,mode='a',newline='') as output_file:
             output_writer = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             output_writer.writerow(["Name","Email", "Role","Company","Industry","Country"])
             for each in data:
                 try:
-                    output_writer.writerow([each['name'], each['email'], each['role'], each['company'], each['industry'], each['country'] ])
+                    if each['industry']==self.industry:
+                        output_writer.writerow([each['name'], each['email'], each['role'], each['company'], each['industry'], each['country'] ])
                 except:
                     pass
 
@@ -200,9 +202,13 @@ class DataCrawler:
             next_sibling = driver.execute_script("return arguments[0].nextElementSibling", name)
             name = name.text
             desc = next_sibling.text
-            split = desc.split("•")
-            role = split[0]
-            company = split[1]
+            try:
+                split = desc.split("•")
+                role = split[0]
+                company = split[1]
+            except:
+                role=''
+                company=''
             tbl = driver.find_element_by_css_selector("table.table-text-info")
             rows = tbl.find_elements_by_tag_name("tr")
             email= ''
@@ -272,6 +278,7 @@ class DataCrawler:
         data=[]
         with open("config.json","rb") as config_file:
             input_data = json.loads(config_file.read())
+        import pdb; pdb.set_trace()
         for x in input_data['criteria']:
             self.country = x['country']
             self.industry = x['industry']
