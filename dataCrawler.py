@@ -285,6 +285,7 @@ class DataCrawler:
             try:
                 add_list = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"a.styled-button.minimize")))
                 add_list.click()
+                time.sleep(3)
                 modal = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div#itemsModal")))
                 feild = modal.find_element_by_name("name")
                 ActionChains(driver).move_to_element(feild).perform()
@@ -329,8 +330,10 @@ class DataCrawler:
                     info = self.get_person_info()
                     data.append(info)
                 print("Creating Csv file....")
-                self.create_csv(data)
-                print("Csv file created successfully....")
+                if data:
+                    self.create_csv(data)
+                    data=[]
+                    print("Csv file created successfully....")
 
 if __name__ == "__main__":
     DataCrawler().main()
