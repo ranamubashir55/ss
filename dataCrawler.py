@@ -138,7 +138,7 @@ class DataCrawler:
         time.sleep(4)
         status=False
         l_page=''
-        roles=["cfo","ceo","controller","chief executive officer","chief financial officer"]
+        roles=["cfo","ceo","chief executive officer","chief financial officer","president"]
         while True:
             try:
                 table = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.table-flex.columns_4")))

@@ -4,7 +4,31 @@
             "country": "United Kingdom",
             "industry": "Capital Markets",
             "company_size": "G",
-            "list_name":"cfo and ceo only"
+            "list_name":"capital_market_UK"
+        },
+        {
+            "country": "United Kingdom",
+            "industry": "Venture Capital & Private Equity",
+            "company_size": "F",
+            "list_name":"venture_capital_UK"
+        },
+        {
+            "country": "United Kingdom",
+            "industry": "Investment Banking/Venture",
+            "company_size": "C",
+            "list_name":"investment_banking_UK"
+        },
+        {
+            "country": "United Kingdom",
+            "industry": "Investment Management",
+            "company_size": "F",
+            "list_name":"investment_manage_UK"
+        },
+        {
+            "country": "United Kingdom",
+            "industry": "Investment Management",
+            "company_size": "F",
+            "list_name":"investment_manage_UK"
         }
     ]
 }
