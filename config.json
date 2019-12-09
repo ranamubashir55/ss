@@ -9,26 +9,26 @@
         {
             "country": "United Kingdom",
             "industry": "Venture Capital & Private Equity",
-            "company_size": "F",
+            "company_size": "G",
             "list_name":"venture_capital_UK"
         },
         {
             "country": "United Kingdom",
             "industry": "Investment Banking/Venture",
-            "company_size": "C",
+            "company_size": "B",
             "list_name":"investment_banking_UK"
         },
         {
             "country": "United Kingdom",
             "industry": "Investment Management",
-            "company_size": "F",
+            "company_size": "G",
             "list_name":"investment_manage_UK"
         },
         {
             "country": "United Kingdom",
-            "industry": "Investment Management",
-            "company_size": "F",
-            "list_name":"investment_manage_UK"
+            "industry": "Oil & Energy",
+            "company_size": "H",
+            "list_name":"oil_energy_UK"
         }
     ]
 }
