@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Company Profiles</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+<style>
+[include*="form-input-select()"] {
+  display: block;
+  padding: 0;
+  position: relative;
+  color: #005BA6;
+  display: block;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 16px;
+  margin-top: 9px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+[include*="form-input-select()"]::before, [include*="form-input-select()"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+[include*="form-input-select()"] select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+       appearance: none;
+  background: none;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  border: 1px solid transparent;
+  font-size: 12px;
+  outline: none;
+  /* Focus style */
+}
+[include*="form-input-select()"] select:focus {
+  background-color: transparent;
+  outline: none;
+}
+[include*="form-input-select()"] option {
+  font-weight: normal;
+}
+[include*="form-input-select()"] x:-o-prefocus, [include*="form-input-select()"]::after {
+  display: none;
+}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  [include*="form-input-select()"] select::-ms-expand {
+    display: none;
+  }
+  [include*="form-input-select()"] select:focus::-ms-value {
+    background: transparent;
+    color: #000;
+  }
+}
+@-moz-document url-prefix() {
+  [include*="form-input-select()"] {
+    overflow: hidden;
+  }
+  [include*="form-input-select()"] select {
+    width: 120%;
+    width: calc(100% + 3em);
+    /* Firefox focus has odd artifacts around the text, this kills that. See https://developer.mozilla.org/en-US/docs/Web/CSS/:-moz-focusring */
+  }
+  @supports (-moz-appearance: none) {
+    [include*="form-input-select()"] select {
+      width: 100%;
+    }
+  }
+  [include*="form-input-select()"] select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+  }
+}
+@supports (-moz-appearance: none) {
+  [include*="form-input-select()"] {
+    width: 100%;
+  }
+}
+[include*="form-input-select()"]::before, [include*="form-input-select()"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid transparent;
+  width: 0;
+  height: 0;
+  right: 16px;
+}
+[include*="form-input-select()"]::before {
+  bottom: 55%;
+  border-width: 0 4px 5px 4px;
+  border-bottom-color: #D6D6D6;
+}
+[include*="form-input-select()"]::after {
+  border-width: 5px 4px 0 4px;
+  border-top-color: #D6D6D6;
+  top: 55%;
+}
+@-moz-document url-prefix() {
+  [include*="form-input-select()"] {
+    border-right: 3px solid #E6E6E6;
+  }
+  [include*="form-input-select()"]:hover {
+    border-right: 3px solid #005BA6;
+  }
+}
+[include*="form-input-select()"]:hover select {
+  box-shadow: 0 2px 3px rgba(0, 91, 166, 0.1) inset;
+  border-color: #005BA6;
+}
+[include*="form-input-select()"]:hover select:focus {
+  outline-color: transparent;
+}
+[include*="form-input-select()"]:hover::before {
+  border-bottom-color: #005BA6;
+}
+[include*="form-input-select()"]:hover::after {
+  border-top-color: #005BA6;
+}
+[include*="form-input-select()"] select {
+  border: 3px solid #E6E6E6;
+  border-radius: 0;
+  font-weight: 400;
+  color: inherit;
+  padding: 7px 15px;
+  line-height: normal;
+  transition: border-color 0.2s ease, outline 0.2s ease;
+}
+[include*="form-input-select()"] select:focus {
+  box-shadow: 0 3px 4px rgba(0, 91, 166, 0.3) inset;
+  outline: 3px solid #005BA6;
+  outline-offset: -3px;
+}
+[include*="form-input-select()"] select[disabled], [include*="form-input-select()"] select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+[include*="form-input-select()"] select:not(:focus):invalid {
+  color: #C7C7C7;
+}
+
+.action_btn{
+	padding: 12px;
+}
+.action_btn>button{
+	background: none;
+    outline: none;
+}
+.action_btn .add_btn{
+    color: #ffffff;
+    background: #297929;
+	font-size: 12px;
+    border: 2px;
+    border-color: #4CAF50;
+    font-weight: 700;
+	line-height: 0;
+	padding: 15px;
+    border-radius: 3px;
+}
+.action_btn .add_btn>span{
+    font-size: 24px;
+    line-height: 0;
+    vertical-align: sub;
+
+}
+.action_btn .remove_btn{
+    color: #ff9999;
+    background: #ffcece;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	border: 2px solid;
+	margin-top: 8px;
+}
+.action_btn .remove_btn:hover{
+	background-color: #ff9c9c;
+}
+.submit-btn{
+	margin-right: 95px;
+    margin-top: 35px;
+    padding: 5px 30px;
+}
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+#overlay {
+  position: fixed; /* Sit on top of the page content */
+   /* display: none; Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 99; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+
+.overlay_text_container{
+  position: relative;
+  text-align: center;
+  color: white;
+  height: 100vh;
+}
+.overlay_text_centered {
+  font-size: 40px;
+  font-weight: 900;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+</style>
+</head>
+<body>
+    {% if data %}
+    <div id="overlay">
+        <div class="overlay_text_container">
+            <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job</div>
+        </div>
+      </div>
+    {% endif %}
+	<div class="container">
+		<div class="py-5">
+			<form action="javacsript:void(0)" method="POST">
+				<h2>Select Company Profiles</h2>
+				<div class="mt-4 fields-wrapper">
+				<div class="row master-row">
+					<div class="col-md-3">
+							<div include="form-input-select()">
+								<select required name="country[]">
+								<!--
+								This is how we can do "placeholder" options.
+								note: "required" attribute is on the select
+								-->
+								<option value="" hidden >Country</option>
+								<!-- normal options -->
+								<option value="United Kingdom">United Kingdom</option>
+								<option value="United States">United States</option>
+								<option value="Switzerland">Switzerland</option>
+								<option value="Hong Kong">Hong Kong</option>
+								<option value="China">China</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-3">
+							<div include="form-input-select()">
+								<select required name="industry[]">
+								<!--
+								This is how we can do "placeholder" options.
+								note: "required" attribute is on the select
+								-->
+								<option value="" hidden >Category</option>
+								<!-- normal options -->
+								<option value="Capital Markets">Capital Markets</option>
+								<option value="Venture Capital & Private Equity">Venture Capital & Private Equity</option>
+								<option value="Investment Banking/Venture">Investment Banking/Venture</option>
+								<option value="Investment Management">Investment Management</option>
+								<option value="Oil & Energy">Oil & Energy</option>
+								<option value="Financial Services">Financial Services</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-3">
+							<div include="form-input-select()">
+								<select required name="comapny_Size[]">
+								<!--
+								This is how we can do "placeholder" options.
+								note: "required" attribute is on the select
+								-->
+								<option value="" hidden >Company Size</option>
+								<!-- normal options -->
+								<option value="A">A (Self)</option>
+								<option value="B">B (1-10)</option>
+								<option value="C">C (11-50)</option>
+								<option value="D">D (51-200)</option>
+								<option value="E">E (201-500)</option>
+								<option value="F">F (501-1000)</option>
+								<option value="G">G (1001-5000)</option>
+								<option value="H">H (5001-10000)</option>
+								<option value="I">I (10000+)</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="action_btn">
+						<button type="button" class="add_btn" id="add_moreFields" title="Add more fields"><span>&plus;</span> Add Fields</button>
+					</div>
+					</div>
+				</div>
+			</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="">
+							<button type="submit" class="btn btn-primary submit-btn">Submit</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+	$(document).ready(function(){
+		$('#add_moreFields').on('click', function(){
+			var master = $('.master-row').clone().removeClass('master-row');
+			master.find('.action_btn button').replaceWith('<button type="button" class="remove_btn remove_field">&#x2716;</button>')
+			$('.fields-wrapper').append(master);
+		});
+		$('body').on('click','.remove_field', function(){
+			$(this).closest('.row').remove();
+		});
+
+    $('form').submit(function(){
+      var countries = $("select[name='country[]']").map(function(){return $(this).val();}).get();
+      var industries = $("select[name='industry[]']").map(function(){return $(this).val();}).get();
+      var comapny_Size = $("select[name='comapny_Size[]']").map(function(){return $(this).val();}).get();
+      var criteria = [];
+      for (let i = 0; i < countries.length; i++) {
+        let data = {};
+        data.country = countries[i];
+        data.industry = industries[i];
+        data.company_size = comapny_Size[i];
+        data.list_name =  industries[i].split(" ").join("").split("/").join("").split("&").join("") + countries[i].split(" ").join("");
+        criteria.push(data)
+      }
+      console.log(criteria)
+      
+
+      $.ajax({
+        type: 'POST',
+        url: '/formData',
+        data: JSON.stringify(criteria),
+        contentType: 'application/json',
+        success: function (response_data) {
+            
+            
+        }   
+    });
+
+    $('body').append(`<div id="overlay">
+        <div class="overlay_text_container">
+            <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job</div>
+        </div>
+      </div>`);
+
+    })
+
+    
+    setInterval(() => {
+        location.reload(true);
+      }, 15000);
+      
+
+	})
+	</script>
+</body>
+</html>

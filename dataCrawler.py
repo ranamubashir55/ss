@@ -298,13 +298,11 @@ class DataCrawler:
         else:        
             print("list already exist")
 
-
-    def main(self):
+    def main(self, input_data):
         data=[]
-        with open("config.json","rb") as config_file:
-            input_data = json.loads(config_file.read())
-        import pdb; pdb.set_trace()
-        for x in input_data['criteria']:
+        # with open("config.json","rb") as config_file:
+        #     input_data = json.loads(config_file.read())
+        for x in input_data:
             self.country = x['country']
             self.industry = x['industry']
             self.range = x['company_size']
