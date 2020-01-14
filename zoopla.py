@@ -7,8 +7,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-import time
-import json
+import time, requests
+import json, re
 
 
 
@@ -17,6 +17,8 @@ class DataCrawler:
         self.username = "bill.wpmlaw@solicltors.com"
         self.password = "monster1."
         self.loginURL = "https://www.zoopla.co.uk/signin/"
+        self.API_KEY = "5eb9fc97e70f710fa844f83854a867af"
+        self.proxy={}
         self.do_login()
 
     def do_login(self):
@@ -64,6 +66,38 @@ class DataCrawler:
             status = False
 
         return status
+    
+    def solve_captcha(self, _dr, _sitekey, _input_field):
+        _unresolved = True
+        while _unresolved:
+            _session = requests.Session()
+            _captcha_id = _session.post(f"http://2captcha.com/in.php?key={self.API_KEY}&method=userrecaptcha&lang=zh&googlekey={_sitekey}&pageurl={_dr.current_url}",proxies=self.proxy).text
+            _captcha_id = _captcha_id.split('|')[1]
+            time.sleep(20)
+            _recaptcha_answer = _session.get(f"http://2captcha.com/res.php?key={self.API_KEY}&action=get&id={_captcha_id}",proxies=self.proxy).text
+
+            while 'CAPCHA_NOT_READY' in _recaptcha_answer:
+                try:
+                    time.sleep(5)
+                    _recaptcha_answer = _session.get(
+                        f"http://2captcha.com/res.php?key={self.API_KEY}&action=get&id={_captcha_id}",
+                        proxies=self.proxy).text
+                except Exception as e:
+                    print(e)
+                    _recaptcha_answer = 'CAPCHA_NOT_READY'
+
+            if 'ERROR' in _recaptcha_answer:
+                print('2captcha unsucceded in solving...')
+                return False
+            _answer = _recaptcha_answer.split('|')[1]
+            # _response = _input_field
+            try:
+                _dr.execute_script("document.getElementsByClassName('g-recaptcha-response')[0].value = '"+_answer+"'")
+                _dr.execute_script("recaptchaSuccess();")
+                _unresolved = False
+            except Exception as _error:
+                print(_error)
+        return None
 
     def get_all_properties(self):
         agents_link = []
@@ -108,19 +142,36 @@ class DataCrawler:
                 pass
         return agents_link
 
-    def send_msg_to_agent(self, agent_link):
+    def send_msg_to_agent(self, agent_link, message):
         driver.get(agent_link)
-        pass
+        try:
+            WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"form#for-sale-lead-form")))
+            msg = driver.find_element_by_css_selector("textarea#message")
+            msg.send_keys(message)
+            captcha = driver.find_element_by_css_selector("div.g-recaptcha")
+            if driver.find_elements_by_name("g-recaptcha-response"):
+                sitekey = re.findall(r'sitekey=\"([a-zA-Z0-9-_]*)\"', driver.page_source)
+                if sitekey:
+                    sitekey = sitekey[0]
+                    responsefield = driver.find_element_by_name("g-recaptcha-response")
+                    self.solve_captcha(driver, sitekey, responsefield)
+                    submit = driver.find_element_by_css_selector("input.ui-button-primary")
+                    submit.click()
+                    WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.lf-confirmation-heading__email-sent")))
+                    print("Msg sent successfully")
+        except Exception as ex:
+            print("error msg not sent   ", ex)
 
-    def main(self, loc, min_price, max_price):
+    def main(self, loc, min_price, max_price, message):
         status = self.property_search(loc, min_price, max_price)
         if status:
             all_agents = self.get_all_properties()
             if all_agents:
+                import pdb; pdb.set_trace()
                 for link in all_agents:
-                    self.send_msg_to_agent(link)
+                    self.send_msg_to_agent(link, message)
         else:
             print("error in criteria retry..")
 
 if __name__ == "__main__":
-    DataCrawler().main("London","2100000","2200000")
+    DataCrawler().main("London","2100000","2200000", "details")
