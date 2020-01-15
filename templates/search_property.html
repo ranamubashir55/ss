@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Houses and Flats for Sale</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+<style>
+[include*="form-input-select()"] {
+  display: block;
+  padding: 0;
+  position: relative;
+  color: #005BA6;
+  display: block;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 16px;
+  margin-top: 9px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+[include*="form-input-select()"]::before, [include*="form-input-select()"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+[include*="form-input-select()"] select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+       appearance: none;
+  background: none;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  border: 1px solid transparent;
+  font-size: 12px;
+  outline: none;
+  /* Focus style */
+}
+[include*="form-input-select()"] select:focus {
+  background-color: transparent;
+  outline: none;
+}
+[include*="form-input-select()"] option {
+  font-weight: normal;
+}
+[include*="form-input-select()"] x:-o-prefocus, [include*="form-input-select()"]::after {
+  display: none;
+}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  [include*="form-input-select()"] select::-ms-expand {
+    display: none;
+  }
+  [include*="form-input-select()"] select:focus::-ms-value {
+    background: transparent;
+    color: #000;
+  }
+}
+@-moz-document url-prefix() {
+  [include*="form-input-select()"] {
+    overflow: hidden;
+  }
+  [include*="form-input-select()"] select {
+    width: 120%;
+    width: calc(100% + 3em);
+    /* Firefox focus has odd artifacts around the text, this kills that. See https://developer.mozilla.org/en-US/docs/Web/CSS/:-moz-focusring */
+  }
+  @supports (-moz-appearance: none) {
+    [include*="form-input-select()"] select {
+      width: 100%;
+    }
+  }
+  [include*="form-input-select()"] select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+  }
+}
+@supports (-moz-appearance: none) {
+  [include*="form-input-select()"] {
+    width: 100%;
+  }
+}
+[include*="form-input-select()"]::before, [include*="form-input-select()"]::after {
+  content: '';
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid transparent;
+  width: 0;
+  height: 0;
+  right: 16px;
+}
+[include*="form-input-select()"]::before {
+  bottom: 55%;
+  border-width: 0 4px 5px 4px;
+  border-bottom-color: #D6D6D6;
+}
+[include*="form-input-select()"]::after {
+  border-width: 5px 4px 0 4px;
+  border-top-color: #D6D6D6;
+  top: 55%;
+}
+@-moz-document url-prefix() {
+  [include*="form-input-select()"] {
+    border-right: 3px solid #E6E6E6;
+  }
+  [include*="form-input-select()"]:hover {
+    border-right: 3px solid #005BA6;
+  }
+}
+[include*="form-input-select()"]:hover select {
+  box-shadow: 0 2px 3px rgba(0, 91, 166, 0.1) inset;
+  border-color: #005BA6;
+}
+[include*="form-input-select()"]:hover select:focus {
+  outline-color: transparent;
+}
+[include*="form-input-select()"]:hover::before {
+  border-bottom-color: #005BA6;
+}
+[include*="form-input-select()"]:hover::after {
+  border-top-color: #005BA6;
+}
+[include*="form-input-select()"] select {
+  border: 3px solid #E6E6E6;
+  border-radius: 0;
+  font-weight: 400;
+  color: inherit;
+  padding: 7px 15px;
+  line-height: normal;
+  transition: border-color 0.2s ease, outline 0.2s ease;
+}
+[include*="form-input-select()"] select:focus {
+  box-shadow: 0 3px 4px rgba(0, 91, 166, 0.3) inset;
+  outline: 3px solid #005BA6;
+  outline-offset: -3px;
+}
+[include*="form-input-select()"] select[disabled], [include*="form-input-select()"] select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+[include*="form-input-select()"] select:not(:focus):invalid {
+  color: #C7C7C7;
+}
+
+.action_btn{
+	padding: 12px;
+}
+.action_btn>button{
+	background: none;
+    outline: none;
+}
+.action_btn .add_btn{
+    color: #ffffff;
+    background: #297929;
+	font-size: 12px;
+    border: 2px;
+    border-color: #4CAF50;
+    font-weight: 700;
+	line-height: 0;
+	padding: 15px;
+    border-radius: 3px;
+}
+.action_btn .add_btn>span{
+    font-size: 24px;
+    line-height: 0;
+    vertical-align: sub;
+
+}
+.action_btn .remove_btn{
+    color: #ff9999;
+    background: #ffcece;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	border: 2px solid;
+	margin-top: 8px;
+}
+.action_btn .remove_btn:hover{
+	background-color: #ff9c9c;
+}
+.submit-btn{
+	margin-right: 95px;
+    margin-top: 35px;
+    padding: 5px 30px;
+}
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+#overlay {
+  position: fixed; /* Sit on top of the page content */
+   /* display: none; Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 99; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+
+.overlay_text_container{
+  position: relative;
+  text-align: center;
+  color: white;
+  height: 100vh;
+}
+.overlay_text_centered {
+  font-size: 40px;
+  font-weight: 900;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+</style>
+</head>
+<body>
+    {% if data %}
+    <div id="overlay">
+        <div class="overlay_text_container">
+            <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job</div>
+        </div>
+      </div>
+    {% endif %}
+	<div class="container">
+		<div class="py-5">
+			<form action="javacsript:void(0)" method="POST">
+				<h2>Search Property</h2>
+				<div class="mt-4 fields-wrapper">
+				<div class="row master-row">
+					<div class="col-md-3">
+							<div class="form-group" style = "margin-top: 9px">
+								<input class="form-control" required name="location" placeholder="e.g. Oxford, NW3 or Waterloo Station">
+						</div>
+					</div>
+					<div class="col-md-3">
+							<div include="form-input-select()">
+								<select required name="min_price">
+								<!--
+								This is how we can do "placeholder" options.
+								note: "required" attribute is on the select
+								-->
+								<option value="" hidden >Min price</option>
+								<!-- normal options -->
+								<option value="">No min</option>
+                                <option value="10000" data-condensed="10k">£10,000</option>
+                                <option value="20000" data-condensed="20k">£20,000</option>
+                                <option value="30000" data-condensed="30k">£30,000</option>
+                                <option value="40000" data-condensed="40k">£40,000</option>
+                                <option value="50000" data-condensed="50k">£50,000</option>
+                                <option value="60000" data-condensed="60k">£60,000</option>
+                                <option value="70000" data-condensed="70k">£70,000</option>
+                                <option value="80000" data-condensed="80k">£80,000</option>
+                                <option value="90000" data-condensed="90k">£90,000</option>
+                                <option value="100000" data-condensed="100k">£100,000</option>
+                                <option value="110000" data-condensed="110k">£110,000</option>
+                                <option value="120000" data-condensed="120k">£120,000</option>
+                                <option value="125000" data-condensed="125k">£125,000</option>
+                                <option value="130000" data-condensed="130k">£130,000</option>
+                                <option value="140000" data-condensed="140k">£140,000</option>
+                                <option value="150000" data-condensed="150k">£150,000</option>
+                                <option value="160000" data-condensed="160k">£160,000</option>
+                                <option value="170000" data-condensed="170k">£170,000</option>
+                                <option value="180000" data-condensed="180k">£180,000</option>
+                                <option value="190000" data-condensed="190k">£190,000</option>
+                                <option value="200000" data-condensed="200k">£200,000</option>
+                                <option value="210000" data-condensed="210k">£210,000</option>
+                                <option value="220000" data-condensed="220k">£220,000</option>
+                                <option value="230000" data-condensed="230k">£230,000</option>
+                                <option value="240000" data-condensed="240k">£240,000</option>
+                                <option value="250000" data-condensed="250k">£250,000</option>
+                                <option value="275000" data-condensed="275k">£275,000</option>
+                                <option value="300000" data-condensed="300k">£300,000</option>
+                                <option value="325000" data-condensed="325k">£325,000</option>
+                                <option value="350000" data-condensed="350k">£350,000</option>
+                                <option value="375000" data-condensed="375k">£375,000</option>
+                                <option value="400000" data-condensed="400k">£400,000</option>
+                                <option value="425000" data-condensed="425k">£425,000</option>
+                                <option value="450000" data-condensed="450k">£450,000</option>
+                                <option value="475000" data-condensed="475k">£475,000</option>
+                                <option value="500000" data-condensed="500k">£500,000</option>
+                                <option value="550000" data-condensed="550k">£550,000</option>
+                                <option value="600000" data-condensed="600k">£600,000</option>
+                                <option value="650000" data-condensed="650k">£650,000</option>
+                                <option value="700000" data-condensed="700k">£700,000</option>
+                                <option value="750000" data-condensed="750k">£750,000</option>
+                                <option value="800000" data-condensed="800k">£800,000</option>
+                                <option value="850000" data-condensed="850k">£850,000</option>
+                                <option value="900000" data-condensed="900k">£900,000</option>
+                                <option value="950000" data-condensed="950k">£950,000</option>
+                                <option value="1000000" data-condensed="1m">£1,000,000</option>
+                                <option value="1100000" data-condensed="1.1m">£1,100,000</option>
+                                <option value="1200000" data-condensed="1.2m">£1,200,000</option>
+                                <option value="1300000" data-condensed="1.3m">£1,300,000</option>
+                                <option value="1400000" data-condensed="1.4m">£1,400,000</option>
+                                <option value="1500000" data-condensed="1.5m">£1,500,000</option>
+                                <option value="1600000" data-condensed="1.6m">£1,600,000</option>
+                                <option value="1700000" data-condensed="1.7m">£1,700,000</option>
+                                <option value="1800000" data-condensed="1.8m">£1,800,000</option>
+                                <option value="1900000" data-condensed="1.9m">£1,900,000</option>
+                                <option value="2000000" data-condensed="2m">£2,000,000</option>
+                                <option value="2100000" data-condensed="2.1m">£2,100,000</option>
+                                <option value="2200000" data-condensed="2.2m">£2,200,000</option>
+                                <option value="2300000" data-condensed="2.3m">£2,300,000</option>
+                                <option value="2400000" data-condensed="2.4m">£2,400,000</option>
+                                <option value="2500000" data-condensed="2.5m">£2,500,000</option>
+                                <option value="2750000" data-condensed="2.75m">£2,750,000</option>
+                                <option value="3000000" data-condensed="3m">£3,000,000</option>
+                                <option value="3250000" data-condensed="3.25m">£3,250,000</option>
+                                <option value="3500000" data-condensed="3.5m">£3,500,000</option>
+                                <option value="3750000" data-condensed="3.75m">£3,750,000</option>
+                                <option value="4000000" data-condensed="4m">£4,000,000</option>
+                                <option value="4250000" data-condensed="4.25m">£4,250,000</option>
+                                <option value="4500000" data-condensed="4.5m">£4,500,000</option>
+                                <option value="4750000" data-condensed="4.75m">£4,750,000</option>
+                                <option value="5000000" data-condensed="5m">£5,000,000</option>
+                                <option value="5500000" data-condensed="5.5m">£5,500,000</option>
+                                <option value="6000000" data-condensed="6m">£6,000,000</option>
+                                <option value="6500000" data-condensed="6.5m">£6,500,000</option>
+                                <option value="7000000" data-condensed="7m">£7,000,000</option>
+                                <option value="7500000" data-condensed="7.5m">£7,500,000</option>
+                                <option value="8000000" data-condensed="8m">£8,000,000</option>
+                                <option value="8500000" data-condensed="8.5m">£8,500,000</option>
+                                <option value="9000000" data-condensed="9m">£9,000,000</option>
+                                <option value="9500000" data-condensed="9.5m">£9,500,000</option>
+                                <option value="10000000" data-condensed="10m">£10,000,000</option>
+                                <option value="12500000" data-condensed="12.5m">£12,500,000</option>
+                                <option value="15000000" data-condensed="15m">£15,000,000</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-3">
+							<div include="form-input-select()">
+								<select required name="max_price">
+								<!--
+								This is how we can do "placeholder" options.
+								note: "required" attribute is on the select
+								-->
+								<option value="" hidden >Max price</option>
+								<!-- normal options -->
+								<option value="" hidden >Min price</option>
+								<!-- normal options -->
+								<option value="">No Max</option>
+                                <option value="10000" data-condensed="10k">£10,000</option>
+                                <option value="20000" data-condensed="20k">£20,000</option>
+                                <option value="30000" data-condensed="30k">£30,000</option>
+                                <option value="40000" data-condensed="40k">£40,000</option>
+                                <option value="50000" data-condensed="50k">£50,000</option>
+                                <option value="60000" data-condensed="60k">£60,000</option>
+                                <option value="70000" data-condensed="70k">£70,000</option>
+                                <option value="80000" data-condensed="80k">£80,000</option>
+                                <option value="90000" data-condensed="90k">£90,000</option>
+                                <option value="100000" data-condensed="100k">£100,000</option>
+                                <option value="110000" data-condensed="110k">£110,000</option>
+                                <option value="120000" data-condensed="120k">£120,000</option>
+                                <option value="125000" data-condensed="125k">£125,000</option>
+                                <option value="130000" data-condensed="130k">£130,000</option>
+                                <option value="140000" data-condensed="140k">£140,000</option>
+                                <option value="150000" data-condensed="150k">£150,000</option>
+                                <option value="160000" data-condensed="160k">£160,000</option>
+                                <option value="170000" data-condensed="170k">£170,000</option>
+                                <option value="180000" data-condensed="180k">£180,000</option>
+                                <option value="190000" data-condensed="190k">£190,000</option>
+                                <option value="200000" data-condensed="200k">£200,000</option>
+                                <option value="210000" data-condensed="210k">£210,000</option>
+                                <option value="220000" data-condensed="220k">£220,000</option>
+                                <option value="230000" data-condensed="230k">£230,000</option>
+                                <option value="240000" data-condensed="240k">£240,000</option>
+                                <option value="250000" data-condensed="250k">£250,000</option>
+                                <option value="275000" data-condensed="275k">£275,000</option>
+                                <option value="300000" data-condensed="300k">£300,000</option>
+                                <option value="325000" data-condensed="325k">£325,000</option>
+                                <option value="350000" data-condensed="350k">£350,000</option>
+                                <option value="375000" data-condensed="375k">£375,000</option>
+                                <option value="400000" data-condensed="400k">£400,000</option>
+                                <option value="425000" data-condensed="425k">£425,000</option>
+                                <option value="450000" data-condensed="450k">£450,000</option>
+                                <option value="475000" data-condensed="475k">£475,000</option>
+                                <option value="500000" data-condensed="500k">£500,000</option>
+                                <option value="550000" data-condensed="550k">£550,000</option>
+                                <option value="600000" data-condensed="600k">£600,000</option>
+                                <option value="650000" data-condensed="650k">£650,000</option>
+                                <option value="700000" data-condensed="700k">£700,000</option>
+                                <option value="750000" data-condensed="750k">£750,000</option>
+                                <option value="800000" data-condensed="800k">£800,000</option>
+                                <option value="850000" data-condensed="850k">£850,000</option>
+                                <option value="900000" data-condensed="900k">£900,000</option>
+                                <option value="950000" data-condensed="950k">£950,000</option>
+                                <option value="1000000" data-condensed="1m">£1,000,000</option>
+                                <option value="1100000" data-condensed="1.1m">£1,100,000</option>
+                                <option value="1200000" data-condensed="1.2m">£1,200,000</option>
+                                <option value="1300000" data-condensed="1.3m">£1,300,000</option>
+                                <option value="1400000" data-condensed="1.4m">£1,400,000</option>
+                                <option value="1500000" data-condensed="1.5m">£1,500,000</option>
+                                <option value="1600000" data-condensed="1.6m">£1,600,000</option>
+                                <option value="1700000" data-condensed="1.7m">£1,700,000</option>
+                                <option value="1800000" data-condensed="1.8m">£1,800,000</option>
+                                <option value="1900000" data-condensed="1.9m">£1,900,000</option>
+                                <option value="2000000" data-condensed="2m">£2,000,000</option>
+                                <option value="2100000" data-condensed="2.1m">£2,100,000</option>
+                                <option value="2200000" data-condensed="2.2m">£2,200,000</option>
+                                <option value="2300000" data-condensed="2.3m">£2,300,000</option>
+                                <option value="2400000" data-condensed="2.4m">£2,400,000</option>
+                                <option value="2500000" data-condensed="2.5m">£2,500,000</option>
+                                <option value="2750000" data-condensed="2.75m">£2,750,000</option>
+                                <option value="3000000" data-condensed="3m">£3,000,000</option>
+                                <option value="3250000" data-condensed="3.25m">£3,250,000</option>
+                                <option value="3500000" data-condensed="3.5m">£3,500,000</option>
+                                <option value="3750000" data-condensed="3.75m">£3,750,000</option>
+                                <option value="4000000" data-condensed="4m">£4,000,000</option>
+                                <option value="4250000" data-condensed="4.25m">£4,250,000</option>
+                                <option value="4500000" data-condensed="4.5m">£4,500,000</option>
+                                <option value="4750000" data-condensed="4.75m">£4,750,000</option>
+                                <option value="5000000" data-condensed="5m">£5,000,000</option>
+                                <option value="5500000" data-condensed="5.5m">£5,500,000</option>
+                                <option value="6000000" data-condensed="6m">£6,000,000</option>
+                                <option value="6500000" data-condensed="6.5m">£6,500,000</option>
+                                <option value="7000000" data-condensed="7m">£7,000,000</option>
+                                <option value="7500000" data-condensed="7.5m">£7,500,000</option>
+                                <option value="8000000" data-condensed="8m">£8,000,000</option>
+                                <option value="8500000" data-condensed="8.5m">£8,500,000</option>
+                                <option value="9000000" data-condensed="9m">£9,000,000</option>
+                                <option value="9500000" data-condensed="9.5m">£9,500,000</option>
+                                <option value="10000000" data-condensed="10m">£10,000,000</option>
+                                <option value="12500000" data-condensed="12.5m">£12,500,000</option>
+                                <option value="15000000" data-condensed="15m">£15,000,000</option>
+							</select>
+						</div>
+                    </div>
+                    
+					<!-- <div class="col-md-3">
+						<div class="action_btn">
+						    <button type="button" class="add_btn" id="add_moreFields" title="Add more fields"><span>&plus;</span> Add Fields</button>
+					    </div>
+					</div> -->
+                </div>
+                <div class="row">
+                    <div class="col-md-9">
+                        <textarea name="message" class="form-control" maxlength="400" placeholder="Message" spellcheck="false" autocorrect="off"></textarea>
+                    </div>
+                </div>
+			</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="">
+							<button type="submit" class="btn btn-primary submit-btn">Submit</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+	$(document).ready(function(){
+		$('#add_moreFields').on('click', function(){
+			var master = $('.master-row').clone().removeClass('master-row');
+			master.find('.action_btn button').replaceWith('<button type="button" class="remove_btn remove_field">&#x2716;</button>')
+			$('.fields-wrapper').append(master);
+		});
+		$('body').on('click','.remove_field', function(){
+			$(this).closest('.row').remove();
+		});
+
+    $('form').submit(function(){
+      var countries = $("input[name='location']").map(function(){return $(this).val();}).get();
+      var industries = $("select[name='min_price']").map(function(){return $(this).val();}).get();
+      var comapny_Size = $("select[name='max_price']").map(function(){return $(this).val();}).get();
+      var msg = $("textarea[name='message']").map(function(){return $(this).val();}).get();
+      var criteria = [];
+      for (let i = 0; i < countries.length; i++) {
+        let data = {};
+        data.location = countries[i];
+        data.minPrice = industries[i];
+        data.maxPrice = comapny_Size[i];
+        data.message = msg[i];
+        criteria.push(data)
+      }
+      console.log(criteria)
+      
+
+      $.ajax({
+        type: 'POST',
+        url: '/formData',
+        data: JSON.stringify(criteria),
+        contentType: 'application/json',
+        success: function (response_data) {
+            
+            
+        }   
+    });
+
+    $('body').append(`<div id="overlay">
+        <div class="overlay_text_container">
+            <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job</div>
+        </div>
+      </div>`);
+
+    })
+
+    
+    setInterval(() => {
+        location.reload(true);
+      }, 15000);
+      
+
+	})
+	</script>
+</body>
+</html>

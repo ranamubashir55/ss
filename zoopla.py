@@ -162,16 +162,22 @@ class DataCrawler:
         except Exception as ex:
             print("error msg not sent   ", ex)
 
-    def main(self, loc, min_price, max_price, message):
-        status = self.property_search(loc, min_price, max_price)
-        if status:
-            all_agents = self.get_all_properties()
-            if all_agents:
-                import pdb; pdb.set_trace()
-                for link in all_agents:
-                    self.send_msg_to_agent(link, message)
-        else:
-            print("error in criteria retry..")
+    def main(self, input_data):
 
-if __name__ == "__main__":
-    DataCrawler().main("London","2100000","2200000", "details")
+        for x in input_data:
+            location = x['location']
+            minPrice = x['minPrice']
+            maxPrice = x['maxPrice']
+            message = x['message']
+            status = self.property_search(location, minPrice, maxPrice)
+            if status:
+                all_agents = self.get_all_properties()
+                if all_agents:
+                    import pdb; pdb.set_trace()
+                    for link in all_agents:
+                        self.send_msg_to_agent(link, message)
+            else:
+                print("error in criteria retry..")
+
+# if __name__ == "__main__":
+#     DataCrawler().main("London","2100000","2200000", "details")
