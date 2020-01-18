@@ -185,7 +185,7 @@ class DataCrawler:
                     yield 'done'
 
             else:
-                yield("error while adding criteria retry..")
+                yield("error while login retry..")
 
 # if __name__ == "__main__":
 #     DataCrawler().main("London","2100000","2200000", "details")

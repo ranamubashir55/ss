@@ -35,6 +35,9 @@ def add_criteria():
         if'done' in x:
             job_status=False
             socketio.emit("update",'Job completed..reload page and start new job.')
+        if 'retry' in x:
+            job_status=False
+            socketio.emit("update",'error in login retry..')
 
     return 'done'
 
