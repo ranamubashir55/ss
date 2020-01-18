@@ -181,7 +181,7 @@ class DataCrawler:
                     yield 'Total properties found '+str(len(all_agents))
                     for index, link in enumerate(all_agents):
                         self.send_msg_to_agent(link, message)
-                        yield str(index+1)+"msg sent of "+str(len(all_agents))
+                        yield str(index+1)+" of "+str(len(all_agents)+" messages sent")
                     yield 'done'
 
             else:
