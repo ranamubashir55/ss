@@ -17,14 +17,16 @@ class DataCrawler:
         self.username = "bill.wpmlaw@solicltors.com"
         self.password = "monster1."
         self.loginURL = "https://www.zoopla.co.uk/signin/"
-        self.API_KEY = "5eb9fc97e70f710fa844f83854a867af"
+        self.API_KEY = "9d0836c76aa45f9407ed8fe446cc0d94"
         self.proxy={}
         self.do_login()
 
     def do_login(self):
         global driver, timeout
         timeout= 7
-        driver = webdriver.Chrome("chromedriver.exe")
+        chrome_options = webdriver.ChromeOptions()
+        # chrome_options.add_argument('--headless')
+        driver = webdriver.Chrome("chromedriver.exe", options=chrome_options)
         driver.get(self.loginURL)
         driver.maximize_window()
         try:
@@ -57,6 +59,7 @@ class DataCrawler:
                 if maxPrice in x.get_attribute("value"):
                     x.click()
                     break
+            driver.save_screenshot('s.png')
             btn = driver.find_element_by_css_selector("button#search-submit")
             btn.click()
             print("Criteria added successfully....")
@@ -154,7 +157,9 @@ class DataCrawler:
                 if sitekey:
                     sitekey = sitekey[0]
                     responsefield = driver.find_element_by_name("g-recaptcha-response")
+                    print("Resolving Captcha...")
                     self.solve_captcha(driver, sitekey, responsefield)
+                    print("Captcha Resolved successfully..")
                     submit = driver.find_element_by_css_selector("input.ui-button-primary")
                     submit.click()
                     WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.lf-confirmation-heading__email-sent")))
@@ -170,14 +175,17 @@ class DataCrawler:
             maxPrice = x['maxPrice']
             message = x['message']
             status = self.property_search(location, minPrice, maxPrice)
-            if status:
+            if False:
                 all_agents = self.get_all_properties()
                 if all_agents:
-                    import pdb; pdb.set_trace()
-                    for link in all_agents:
+                    yield 'Total properties found '+str(len(all_agents))
+                    for index, link in enumerate(all_agents):
                         self.send_msg_to_agent(link, message)
+                        yield str(index+1)+"msg sent of "+str(len(all_agents))
+                    yield 'done'
+
             else:
-                print("error in criteria retry..")
+                yield("error while adding criteria retry..")
 
 # if __name__ == "__main__":
 #     DataCrawler().main("London","2100000","2200000", "details")

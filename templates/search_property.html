@@ -449,7 +449,7 @@ html {
                 </div>
                 <div class="row">
                     <div class="col-md-9">
-                        <textarea name="message" class="form-control" maxlength="400" placeholder="Message" spellcheck="false" autocorrect="off"></textarea>
+                        <textarea name="message" class="form-control" required maxlength="200" placeholder="Message" spellcheck="false" autocorrect="off"></textarea>
                     </div>
                 </div>
 			</div>
@@ -462,9 +462,14 @@ html {
 				</div>
 			</form>
 		</div>
-	</div>
-
+  </div>
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 	<script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    
+    
+
 	$(document).ready(function(){
 		$('#add_moreFields').on('click', function(){
 			var master = $('.master-row').clone().removeClass('master-row');
@@ -499,23 +504,38 @@ html {
         contentType: 'application/json',
         success: function (response_data) {
             
-            
-        }   
+          
+        } 
+
+        //socket.emit('send_msg', JSON.stringify(criteria));
+         
     });
 
     $('body').append(`<div id="overlay">
         <div class="overlay_text_container">
-            <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job</div>
+            <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job<br><div id="test"></div></div>
         </div>
       </div>`);
 
     })
 
     
+
+    socket.on('update', function (data) {
+      console.log(data);
+      $("#test").html(data);
+      if (data=='done'){
+        location.reload(true);
+      }
+    });
+
+   /* var c=1;
     setInterval(() => {
         location.reload(true);
+        
+        c=c+1;
       }, 15000);
-      
+      */
 
 	})
 	</script>
