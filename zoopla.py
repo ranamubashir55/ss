@@ -175,7 +175,7 @@ class DataCrawler:
             maxPrice = x['maxPrice']
             message = x['message']
             status = self.property_search(location, minPrice, maxPrice)
-            if False:
+            if status:
                 all_agents = self.get_all_properties()
                 if all_agents:
                     yield 'Total properties found '+str(len(all_agents))
