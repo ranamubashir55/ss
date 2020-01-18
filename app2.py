@@ -34,7 +34,7 @@ def add_criteria():
         socketio.emit("update", x)
         if'done' in x:
             job_status=False
-            socketio.emit("update",'done')
+            socketio.emit("update",'Job completed..reload page and start new job.')
 
     return 'done'
 
