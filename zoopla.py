@@ -183,7 +183,6 @@ class DataCrawler:
                         self.send_msg_to_agent(link, message)
                         yield (str(index+1)+" of "+str(len(all_agents))+" messages sent")
                     yield 'done'
-
             else:
                 yield("error while login retry..")
 
