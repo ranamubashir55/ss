@@ -1,7 +1,5 @@
 import json, requests
 from flask import Flask, render_template, redirect, url_for
-import paramiko
-import sqlite3
 from flask_cors import CORS
 from flask import request
 import zoopla
