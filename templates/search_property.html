@@ -472,14 +472,18 @@ html {
 				<div class="row">
 					<div class="col-md-12">
 						<div class="">
-							<button type="submit" class="btn btn-primary submit-btn">Submit</button>
+							<button type="submit" class="btn btn-primary submit-btn" style="margin-bottom: 16px">Submit</button>
 						</div>
 					</div>
 				</div>
       </form>
       {% if data %}
       <div class="row">
+          
         <div class="col-md-12">
+            <div class="alert alert-secondary" role="alert">
+                Refresh page for updated info..
+              </div>
             <table class="table">
                 <thead>
                   <tr>
@@ -561,11 +565,13 @@ html {
          
     });
 
-   /* $('body').append(`<div id="overlay">
+    $('body').append(`<div id="overlay">
         <div class="overlay_text_container">
             <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job<br><div id="test"></div></div>
         </div>
-      </div>`);*/
+      </div>`);
+
+      $("#overlay").fadeOut(45000);
 
     })
 
