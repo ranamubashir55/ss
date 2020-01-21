@@ -6,14 +6,21 @@ import zoopla
 import time, json
 import threading
 from flask_socketio import SocketIO
-
+import sqlite3
 app = Flask(__name__)
 socketio = SocketIO(app)
 
 job_status = False
 @app.route("/")
 def home():
-    return render_template("search_property.html", data=job_status)
+    try:
+        conn = sqlite3.connect('job_logs.db')
+        records = conn.execute("select * from job_status")
+        records = records.fetchall()
+    except:
+        records= ''
+
+    return render_template("search_property.html", data=records)
 
 
 
@@ -21,6 +28,7 @@ def home():
 
 @app.route("/formData", methods=['POST','GET'])
 def add_criteria():
+    
     global job_status
     job_status =True
     criteria = request.get_json()

@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time, requests
 import json, re
+import sqlite3
 
 
 
@@ -19,9 +20,9 @@ class DataCrawler:
         self.loginURL = "https://www.zoopla.co.uk/signin/"
         self.API_KEY = "9d0836c76aa45f9407ed8fe446cc0d94"
         self.proxy={}
-        self.do_login()
+        
 
-    def do_login(self):
+    def do_login(self, username, password):
         global driver, timeout
         timeout= 7
         chrome_options = webdriver.ChromeOptions()
@@ -31,13 +32,36 @@ class DataCrawler:
         driver.maximize_window()
         try:
             u = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.ID,"signin_email")))
-            u.send_keys(self.username)
-            driver.find_element_by_id("signin_password").send_keys(self.password)
+            u.send_keys(username)
+            driver.find_element_by_id("signin_password").send_keys(password)
             driver.find_element_by_id("signin_submit").click()
             WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"nav#main-nav")))
             print("logged in successfully")
+            return True
         except Exception:
             print("Login error")
+            return False
+    
+    def insert_data(self, username, password ,location, minPrice, maxPrice, status):
+        global conn
+        conn = sqlite3.connect('job_logs.db')
+        conn.execute('''CREATE TABLE if not exists job_status 
+                (ID INTEGER PRIMARY KEY    AUTOINCREMENT,
+                username           CHAR(50),
+                password            CHAR(50),
+                status        CHAR(50),
+                location         CHAR(50),
+                min_price            CHAR(50),
+                max_price     CHAR(50) );''')
+        print("table created successfully")
+        conn.execute("INSERT INTO job_status (username, password, status, location, min_price, max_price) VALUES ( '"+username+"', '"+password+"', '"+status+"', '"+location+"', '"+minPrice+"', '"+maxPrice+"')")
+        conn.commit()
+        print("data inserted successfully...")
+
+    def update_data(self, status, username, location, minprice, maxprice):
+        conn.execute("UPDATE job_status SET  status = '"+status+"' where username = '"+username+"' and location='"+location+"' and min_price='"+minprice+"' and max_price='"+maxprice+"'")
+        conn.commit()
+        
 
     def property_search(self, location, minPrice, maxPrice):
         driver.get("https://www.zoopla.co.uk/for-sale/")
@@ -174,17 +198,32 @@ class DataCrawler:
             minPrice = x['minPrice']
             maxPrice = x['maxPrice']
             message = x['message']
-            status = self.property_search(location, minPrice, maxPrice)
-            if status:
-                all_agents = self.get_all_properties()
-                if all_agents:
-                    yield 'Total properties found '+str(len(all_agents))
-                    for index, link in enumerate(all_agents):
-                        self.send_msg_to_agent(link, message)
-                        yield (str(index+1)+" of "+str(len(all_agents))+" messages sent")
-                    yield 'done'
+            username = x['username']
+            password = x['password']
+            self.insert_data(username, password ,location, minPrice, maxPrice, "Starting process")
+            login = self.do_login(username, password)
+            if login:
+                status = self.property_search(location, minPrice, maxPrice)
+                if status:
+                    all_agents = self.get_all_properties()
+                    if all_agents:
+                        self.update_data('Total properties found '+str(len(all_agents)), username, location, minPrice, maxPrice)
+                        yield 'Total properties found '+str(len(all_agents))
+                        for index, link in enumerate(all_agents):
+                            self.send_msg_to_agent(link, message)
+                            self.update_data(str(index+1)+" of "+str(len(all_agents))+" messages sent", username, location, minPrice, maxPrice)
+                            yield (str(index+1)+" of "+str(len(all_agents))+" messages sent")
+                        driver.close()
+                        self.update_data("completed", username, location, minPrice, maxPrice)
+                        yield 'done'
+                else:
+                    driver.close()
+                    self.update_data("error while adding criteria retry..", username, location, minPrice, maxPrice)
+                    yield("error while adding criteria retry..")
             else:
-                yield("error while login retry..")
+                driver.close()
+                self.update_data("error in login retry..", username, location, minPrice, maxPrice)
+                yield("error in login retry..")
 
 # if __name__ == "__main__":
 #     DataCrawler().main("London","2100000","2200000", "details")

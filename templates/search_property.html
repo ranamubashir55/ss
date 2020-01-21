@@ -228,19 +228,35 @@ html {
 </style>
 </head>
 <body>
-    {% if data %}
+    <!-- {% if data %}
     <div id="overlay">
         <div class="overlay_text_container">
             <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job</div>
         </div>
       </div>
-    {% endif %}
+    {% endif %} -->
 	<div class="container">
 		<div class="py-5">
 			<form action="javacsript:void(0)" method="POST">
 				<h2>Search Property</h2>
 				<div class="mt-4 fields-wrapper">
+
+            <div class="row master-row">
+                <div class="col-md-4">
+                    <div class="form-group" style = "margin-top: 9px">
+                      <input class="form-control" required name="username" placeholder="Username">
+                  </div>
+                </div>
+    
+                <div class="col-md-4">
+                    <div class="form-group" style = "margin-top: 9px">
+                      <input class="form-control" type="password" required name="password" placeholder="password">
+                  </div>
+                </div>
+            </div>
+
 				<div class="row master-row">
+
 					<div class="col-md-3">
 							<div class="form-group" style = "margin-top: 9px">
 								<input class="form-control" required name="location" placeholder="e.g. Oxford, NW3 or Waterloo Station">
@@ -460,7 +476,37 @@ html {
 						</div>
 					</div>
 				</div>
-			</form>
+      </form>
+      {% if data %}
+      <div class="row">
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">MinPrice</th>
+                    <th scope="col">MaxPrice</th>
+                    <th class="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for x in data %}
+                  <tr>
+                    <td>{{ x[0]}}</td>
+                    <td>{{ x[1] }}</td>
+                    <td>{{ x[4] }}</td>
+                    <td>{{ x[5] }}</td>
+                    <td>{{ x[6] }}</td>
+                    <td>{{ x[3] }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+        </div>
+      </div>
+      {% endif %}
 		</div>
   </div>
   
@@ -481,6 +527,8 @@ html {
 		});
 
     $('form').submit(function(){
+      var username = $("input[name='username']").map(function(){return $(this).val();}).get();
+      var password = $("input[name='password']").map(function(){return $(this).val();}).get();
       var countries = $("input[name='location']").map(function(){return $(this).val();}).get();
       var industries = $("select[name='min_price']").map(function(){return $(this).val();}).get();
       var comapny_Size = $("select[name='max_price']").map(function(){return $(this).val();}).get();
@@ -492,6 +540,8 @@ html {
         data.minPrice = industries[i];
         data.maxPrice = comapny_Size[i];
         data.message = msg[i];
+        data.username = username[i];
+        data.password = password[i];
         criteria.push(data)
       }
       console.log(criteria)
@@ -511,11 +561,11 @@ html {
          
     });
 
-    $('body').append(`<div id="overlay">
+   /* $('body').append(`<div id="overlay">
         <div class="overlay_text_container">
             <div class="overlay_text_centered">A Scrapping job is already running.<br>Let it end to start new job<br><div id="test"></div></div>
         </div>
-      </div>`);
+      </div>`);*/
 
     })
 
@@ -529,13 +579,11 @@ html {
       }*/
     });
 
-   /* var c=1;
+   
     setInterval(() => {
         location.reload(true);
-        
-        c=c+1;
-      }, 15000);
-      */
+      }, 45000);
+      
 
 	})
 	</script>
