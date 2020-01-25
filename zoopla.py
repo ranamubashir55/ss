@@ -42,7 +42,7 @@ class DataCrawler:
             print("Login error")
             return False
     
-    def insert_data(self, username, password ,location, minPrice, maxPrice, status):
+    def insert_data(self, username, password ,location, minPrice, maxPrice, status, fail_msg):
         global conn
         conn = sqlite3.connect('job_logs.db')
         conn.execute('''CREATE TABLE if not exists job_status 
@@ -50,18 +50,22 @@ class DataCrawler:
                 username           CHAR(50),
                 password            CHAR(50),
                 status        CHAR(50),
+                fail            CHAR(50),
                 location         CHAR(50),
                 min_price            CHAR(50),
                 max_price     CHAR(50) );''')
         print("table created successfully")
-        conn.execute("INSERT INTO job_status (username, password, status, location, min_price, max_price) VALUES ( '"+username+"', '"+password+"', '"+status+"', '"+location+"', '"+minPrice+"', '"+maxPrice+"')")
+        conn.execute("INSERT INTO job_status (username, password, status, fail, location, min_price, max_price) VALUES ( '"+username+"', '"+password+"', '"+status+"', '"+fail_msg+"', '"+location+"', '"+minPrice+"', '"+maxPrice+"')")
         conn.commit()
         print("data inserted successfully...")
 
     def update_data(self, status, username, location, minprice, maxprice):
         conn.execute("UPDATE job_status SET  status = '"+status+"' where username = '"+username+"' and location='"+location+"' and min_price='"+minprice+"' and max_price='"+maxprice+"'")
         conn.commit()
-        
+    
+    def update_unsuccess_msg(self, fail_msg, username, location, minprice, maxprice):
+        conn.execute("UPDATE job_status SET  fail = '"+fail_msg+"' where username = '"+username+"' and location='"+location+"' and min_price='"+minprice+"' and max_price='"+maxprice+"'")
+        conn.commit()
 
     def property_search(self, location, minPrice, maxPrice):
         driver.get("https://www.zoopla.co.uk/for-sale/")
@@ -171,6 +175,7 @@ class DataCrawler:
 
     def send_msg_to_agent(self, agent_link, message):
         driver.get(agent_link)
+        msg_status = ''
         try:
             WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"form#for-sale-lead-form")))
             msg = driver.find_element_by_css_selector("textarea#message")
@@ -188,8 +193,12 @@ class DataCrawler:
                     submit.click()
                     WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.lf-confirmation-heading__email-sent")))
                     print("Msg sent successfully")
+                    msg_status = True
         except Exception as ex:
             print("error msg not sent   ", ex)
+            msg_status = False
+
+        return msg_status
 
     def main(self, input_data):
 
@@ -200,30 +209,37 @@ class DataCrawler:
             message = x['message']
             username = x['username']
             password = x['password']
-            self.insert_data(username, password ,location, minPrice, maxPrice, "Starting process")
+            self.insert_data(username, password ,location, minPrice, maxPrice, "Starting process","0")
             login = self.do_login(username, password)
             if login:
                 status = self.property_search(location, minPrice, maxPrice)
                 if status:
+                    self.update_data('Getting properties...', username, location, minPrice, maxPrice)
                     all_agents = self.get_all_properties()
                     if all_agents:
                         self.update_data('Total properties found '+str(len(all_agents)), username, location, minPrice, maxPrice)
-                        yield 'Total properties found '+str(len(all_agents))
+                        print ('Total properties found '+str(len(all_agents)))
+                        msg_fail = 1
                         for index, link in enumerate(all_agents):
-                            self.send_msg_to_agent(link, message)
-                            self.update_data(str(index+1)+" of "+str(len(all_agents))+" messages sent", username, location, minPrice, maxPrice)
-                            yield (str(index+1)+" of "+str(len(all_agents))+" messages sent")
+                            import pdb; pdb.set_trace()
+                            msg_status = self.send_msg_to_agent(link, message)
+                            if msg_status:
+                                self.update_data(str(index+1)+" of "+str(len(all_agents))+" messages sent", username, location, minPrice, maxPrice)
+                                print (str(index+1)+" of "+str(len(all_agents))+" messages sent")
+                            else:
+                                self.update_unsuccess_msg("unsuccessfull messages is "+str(msg_fail), username, location, minPrice, maxPrice)
+                                msg_fail = msg_fail + 1
                         driver.close()
-                        self.update_data("completed", username, location, minPrice, maxPrice)
+                        print ('done')
                         yield 'done'
                 else:
                     driver.close()
                     self.update_data("error while adding criteria retry..", username, location, minPrice, maxPrice)
-                    yield("error while adding criteria retry..")
+                    print("error while adding criteria retry..")
             else:
                 driver.close()
                 self.update_data("error in login retry..", username, location, minPrice, maxPrice)
-                yield("error in login retry..")
+                print("error in login retry..")
 
 # if __name__ == "__main__":
 #     DataCrawler().main("London","2100000","2200000", "details")

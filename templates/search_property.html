@@ -493,6 +493,7 @@ html {
                     <th scope="col">MinPrice</th>
                     <th scope="col">MaxPrice</th>
                     <th class="col">Status</th>
+                    <th class="col">Unsuccess Msgs</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -500,10 +501,11 @@ html {
                   <tr>
                     <td>{{ x[0]}}</td>
                     <td>{{ x[1] }}</td>
-                    <td>{{ x[4] }}</td>
                     <td>{{ x[5] }}</td>
                     <td>{{ x[6] }}</td>
+                    <td>{{ x[7] }}</td>
                     <td>{{ x[3] }}</td>
+                    <td>{{ x[4] }}</td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -585,8 +587,9 @@ html {
       }*/
     });
 
-   
-    setInterval(() => {
+    
+    
+    setTimeout(() => {
         location.reload(true);
       }, 45000);
       
