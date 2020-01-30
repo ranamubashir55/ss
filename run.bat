@@ -1,1 +1,1 @@
-start python app2.py 
+python app2.py 

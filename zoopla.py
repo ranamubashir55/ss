@@ -26,7 +26,7 @@ class DataCrawler:
         global driver, timeout
         timeout= 7
         chrome_options = webdriver.ChromeOptions()
-        # chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--headless')
         driver = webdriver.Chrome("chromedriver.exe", options=chrome_options)
         driver.get(self.loginURL)
         driver.maximize_window()
@@ -221,7 +221,6 @@ class DataCrawler:
                         print ('Total properties found '+str(len(all_agents)))
                         msg_fail = 1
                         for index, link in enumerate(all_agents):
-                            import pdb; pdb.set_trace()
                             msg_status = self.send_msg_to_agent(link, message)
                             if msg_status:
                                 self.update_data(str(index+1)+" of "+str(len(all_agents))+" messages sent", username, location, minPrice, maxPrice)
