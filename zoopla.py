@@ -26,7 +26,7 @@ class DataCrawler:
         global driver, timeout
         timeout= 7
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--headless')
         driver = webdriver.Chrome("chromedriver.exe", options=chrome_options)
         driver.get(self.loginURL)
         driver.maximize_window()
@@ -100,22 +100,28 @@ class DataCrawler:
     
     def solve_captcha(self, _dr, _sitekey, _input_field):
         _unresolved = True
+        c_not_ready = 1
         while _unresolved:
             _session = requests.Session()
             _captcha_id = _session.post(f"http://2captcha.com/in.php?key={self.API_KEY}&method=userrecaptcha&lang=zh&googlekey={_sitekey}&pageurl={_dr.current_url}",proxies=self.proxy).text
             _captcha_id = _captcha_id.split('|')[1]
-            time.sleep(20)
+            time.sleep(15)
             _recaptcha_answer = _session.get(f"http://2captcha.com/res.php?key={self.API_KEY}&action=get&id={_captcha_id}",proxies=self.proxy).text
 
             while 'CAPCHA_NOT_READY' in _recaptcha_answer:
+                print("CAPCHA_NOT_READY", c_not_ready)
                 try:
                     time.sleep(5)
-                    _recaptcha_answer = _session.get(
-                        f"http://2captcha.com/res.php?key={self.API_KEY}&action=get&id={_captcha_id}",
-                        proxies=self.proxy).text
+                    if c_not_ready==13:
+                        print("captcha not resolved in 13 attempts")
+                        return False
+                    _recaptcha_answer = _session.get(f"http://2captcha.com/res.php?key={self.API_KEY}&action=get&id={_captcha_id}",proxies=self.proxy).text
+                    c_not_ready = c_not_ready + 1
                 except Exception as e:
+                    c_not_ready = c_not_ready + 1
                     print(e)
                     _recaptcha_answer = 'CAPCHA_NOT_READY'
+                    
 
             if 'ERROR' in _recaptcha_answer:
                 print('2captcha unsucceded in solving...')
@@ -128,7 +134,7 @@ class DataCrawler:
                 _unresolved = False
             except Exception as _error:
                 print(_error)
-        return None
+        return True
 
     def get_all_properties(self):
         agents_link = []
@@ -174,29 +180,37 @@ class DataCrawler:
         return agents_link
 
     def send_msg_to_agent(self, agent_link, message):
-        driver.get(agent_link)
-        msg_status = ''
-        try:
-            WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"form#for-sale-lead-form")))
-            msg = driver.find_element_by_css_selector("textarea#message")
-            msg.send_keys(message)
-            captcha = driver.find_element_by_css_selector("div.g-recaptcha")
-            if driver.find_elements_by_name("g-recaptcha-response"):
-                sitekey = re.findall(r'sitekey=\"([a-zA-Z0-9-_]*)\"', driver.page_source)
-                if sitekey:
-                    sitekey = sitekey[0]
-                    responsefield = driver.find_element_by_name("g-recaptcha-response")
-                    print("Resolving Captcha...")
-                    self.solve_captcha(driver, sitekey, responsefield)
-                    print("Captcha Resolved successfully..")
-                    submit = driver.find_element_by_css_selector("input.ui-button-primary")
-                    submit.click()
-                    WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.lf-confirmation-heading__email-sent")))
-                    print("Msg sent successfully")
-                    msg_status = True
-        except Exception as ex:
-            print("error msg not sent   ", ex)
-            msg_status = False
+        captcha_status = False
+        msg_status = False
+        c=1
+        while not captcha_status and c<=2:
+            driver.get(agent_link)
+            msg_status = ''
+            try:
+                WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"form#for-sale-lead-form")))
+                msg = driver.find_element_by_css_selector("textarea#message")
+                msg.send_keys(message)
+                captcha = driver.find_element_by_css_selector("div.g-recaptcha")
+                if driver.find_elements_by_name("g-recaptcha-response"):
+                    sitekey = re.findall(r'sitekey=\"([a-zA-Z0-9-_]*)\"', driver.page_source)
+                    if sitekey:
+                        sitekey = sitekey[0]
+                        responsefield = driver.find_element_by_name("g-recaptcha-response")
+                        print("Resolving Captcha...")
+                        captcha_status = self.solve_captcha(driver, sitekey, responsefield)
+                        if not captcha_status:
+                            c+=1
+                            print("Captche fail..retry",c)
+                            continue
+                        print("Captcha Resolved successfully..")
+                        submit = driver.find_element_by_css_selector("input.ui-button-primary")
+                        submit.click()
+                        WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.lf-confirmation-heading__email-sent")))
+                        print("Msg sent successfully")
+                        msg_status = True
+            except Exception as ex:
+                print("error msg not sent   ", ex)
+                msg_status = False
 
         return msg_status
 

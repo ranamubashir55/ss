@@ -4,11 +4,8 @@ from flask_cors import CORS
 from flask import request
 import zoopla
 import time, json
-import threading
-from flask_socketio import SocketIO
 import sqlite3
 app = Flask(__name__)
-# socketio = SocketIO(app)
 
 job_status = False
 @app.route("/")
@@ -33,24 +30,15 @@ def add_criteria():
     job_status =True
     criteria = request.get_json()
     print(criteria)
-    # socketio.emit("update","Starting Process..")
     time.sleep(1)
     for x in zoopla.DataCrawler().main(criteria):
         print('from flask app',x)
-        # socketio.emit("update", x)
-        # if'done' in x:
-        #     job_status=False
-        #     socketio.emit("update",'Job completed..reload page and start new job.')
-        # if 'retry' in x:
-        #     job_status=False
-        #     socketio.emit("update",'error in login retry..')
-
+        
     return 'done'
 
 
 
 if __name__ =="__main__":
     app.run(host= "0.0.0.0", debug=True ,port=80, threaded=True)
-    # socketio.run(app, host= "0.0.0.0", port=80, debug=True)
 
 
