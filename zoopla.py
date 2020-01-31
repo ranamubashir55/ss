@@ -187,7 +187,7 @@ class DataCrawler:
             driver.get(agent_link)
             msg_status = ''
             try:
-                WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"form#for-sale-lead-form")))
+                WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"h1.ui-page-title")))
                 msg = driver.find_element_by_css_selector("textarea#message")
                 msg.send_keys(message)
                 captcha = driver.find_element_by_css_selector("div.g-recaptcha")
