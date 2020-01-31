@@ -211,7 +211,8 @@ class DataCrawler:
             except Exception as ex:
                 print("error msg not sent   ", ex)
                 msg_status = False
-
+                break
+                
         return msg_status
 
     def main(self, input_data):
