@@ -34,7 +34,7 @@ class DataCrawler:
             u = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.ID,"email")))
             u.send_keys(username)
             driver.find_element_by_id("password").send_keys(password)
-            driver.find_element_by_css_selector("div.mrm-button").click()
+            driver.find_element_by_css_selector("button.mrm-button").click()
             WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"a#my-rightmove")))
             print("logged in successfully")
             return True
@@ -67,6 +67,15 @@ class DataCrawler:
         conn.execute("UPDATE job_status SET  fail = '"+fail_msg+"' where username = '"+username+"' and location='"+location+"' and min_price='"+minprice+"' and max_price='"+maxprice+"'")
         conn.commit()
 
+    def serach_location(self, location):
+        print("Search location")
+        try:
+            loc_feild = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"input#searchLocation")))
+            loc_feild.send_keys(location)
+            loc_feild.send_keys(Keys.ENTER)
+        except Exception:
+            print("error location search")
+        return True
     def property_search(self, location, minPrice, maxPrice):
         driver.get("https://www.zoopla.co.uk/for-sale/")
         print("Adding Search criteria...")
@@ -216,7 +225,7 @@ class DataCrawler:
         return msg_status
 
     def main(self, input_data):
-
+        import pdb; pdb.set_trace()
         for x in input_data:
             location = x['location']
             minPrice = x['minPrice']
@@ -225,8 +234,9 @@ class DataCrawler:
             username = x['username']
             password = x['password']
             self.insert_data(username, password ,location, minPrice, maxPrice, "Starting process","0")
-            login = self.do_login(username, password)
+            login = self.do_login("fixisib161@xhyemail.com", "mnbvcxz123")
             if login:
+                self.serach_location(location)
                 status = self.property_search(location, minPrice, maxPrice)
                 if status:
                     self.update_data('Getting properties...', username, location, minPrice, maxPrice)
@@ -245,7 +255,7 @@ class DataCrawler:
                                 msg_fail = msg_fail + 1
                         driver.close()
                         print ('done')
-                        yield 'done'
+                        # yield 'done'
                 else:
                     driver.close()
                     self.update_data("error while adding criteria retry..", username, location, minPrice, maxPrice)
@@ -255,5 +265,6 @@ class DataCrawler:
                 self.update_data("error in login retry..", username, location, minPrice, maxPrice)
                 print("error in login retry..")
 
-# if __name__ == "__main__":
-#     DataCrawler().main("London","2100000","2200000", "details")
+if __name__ == "__main__":
+    arr= [{"daata":""}]
+    DataCrawler().main(arr)
