@@ -73,6 +73,8 @@ class DataCrawler:
             loc_feild = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"input#searchLocation")))
             loc_feild.send_keys(location)
             loc_feild.send_keys(Keys.ENTER)
+            loc_feild = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"button#submit")))
+            loc_feild.click()
         except Exception:
             print("error location search")
         return True
@@ -139,7 +141,7 @@ class DataCrawler:
             # _response = _input_field
             try:
                 _dr.execute_script("document.getElementsByClassName('g-recaptcha-response')[0].value = '"+_answer+"'")
-                _dr.execute_script("recaptchaSuccess();")
+                _dr.execute_script("onCaptchaSubmit();")
                 _unresolved = False
             except Exception as _error:
                 print(_error)
@@ -188,6 +190,26 @@ class DataCrawler:
                 pass
         return agents_link
 
+    def get_agents(self):
+        agents_link = []
+        try:
+            while True:
+                list_results = WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR,"a.propertyCard-contacItem--email")))
+                for x in list_results:
+                    agents_link.append(x.get_attribute("href"))
+                nxt = driver.find_element_by_css_selector("button.pagination-direction--next")
+                driver.execute_script("arguments[0].scrollIntoView({block:'center'});", nxt)
+                nxt.click()
+                time.sleep(2)
+                next_page = driver.find_elements_by_css_selector("div.pagination-controls--disabled")
+                if next_page:
+                    if "Next" in next_page[0].text:
+                        raise Exception
+                print("Agents found yet::",len(agents_link))
+        except Exception as ex:
+            pass
+        return agents_link
+
     def send_msg_to_agent(self, agent_link, message):
         captcha_status = False
         msg_status = False
@@ -196,9 +218,21 @@ class DataCrawler:
             driver.get(agent_link)
             msg_status = ''
             try:
-                WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"h1.ui-page-title")))
-                msg = driver.find_element_by_css_selector("textarea#message")
+                WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div#pageheader")))
+                msg = driver.find_element_by_css_selector("textarea#comments")
                 msg.send_keys(message)
+                msg = driver.find_element_by_css_selector("input#telephone")
+                msg.send_keys("21225458525")
+                msg = driver.find_element_by_css_selector("input#postcode")
+                msg.send_keys("MK6 1AJ")
+                sell_type = driver.find_element_by_css_selector("select#emailAnswerSellSituationType")
+                options = sell_type.find_elements_by_tag_name("option")
+                if options:options[1].click()
+
+                sell_type = driver.find_element_by_css_selector("select#emailAnswerRentSituationType")
+                options = sell_type.find_elements_by_tag_name("option")
+                if options:options[1].click()
+
                 captcha = driver.find_element_by_css_selector("div.g-recaptcha")
                 if driver.find_elements_by_name("g-recaptcha-response"):
                     sitekey = re.findall(r'sitekey=\"([a-zA-Z0-9-_]*)\"', driver.page_source)
@@ -212,7 +246,7 @@ class DataCrawler:
                             print("Captche fail..retry",c)
                             continue
                         print("Captcha Resolved successfully..")
-                        submit = driver.find_element_by_css_selector("input.ui-button-primary")
+                        submit = driver.find_element_by_css_selector("input.touchcontactagent-button-submit")
                         submit.click()
                         WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.lf-confirmation-heading__email-sent")))
                         print("Msg sent successfully")
@@ -236,7 +270,8 @@ class DataCrawler:
             self.insert_data(username, password ,location, minPrice, maxPrice, "Starting process","0")
             login = self.do_login("fixisib161@xhyemail.com", "mnbvcxz123")
             if login:
-                self.serach_location(location)
+                self.serach_location("london")
+                self.get_agents()
                 status = self.property_search(location, minPrice, maxPrice)
                 if status:
                     self.update_data('Getting properties...', username, location, minPrice, maxPrice)
