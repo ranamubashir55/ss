@@ -67,40 +67,28 @@ class DataCrawler:
         conn.execute("UPDATE job_status SET  fail = '"+fail_msg+"' where username = '"+username+"' and location='"+location+"' and min_price='"+minprice+"' and max_price='"+maxprice+"'")
         conn.commit()
 
-    def serach_location(self, location):
-        print("Search location")
+    def property_search(self, location, minPrice, maxPrice):
+        print("Adding Search criteria...")
         try:
             loc_feild = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"input#searchLocation")))
             loc_feild.send_keys(location)
             loc_feild.send_keys(Keys.ENTER)
-            loc_feild = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"button#submit")))
-            loc_feild.click()
-        except Exception:
-            print("error location search")
-        return True
-    def property_search(self, location, minPrice, maxPrice):
-        driver.get("https://www.zoopla.co.uk/for-sale/")
-        print("Adding Search criteria...")
-        try:
-            loc_feild = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"input#search-input-location")))
-            loc_feild.send_keys(location)
-            min_price = driver.find_element_by_css_selector("select#forsale_price_min")
+            min_price = driver.find_element_by_css_selector("select#minPrice")
             min_price.click()
             option = min_price.find_elements_by_tag_name("option")
             for x in option:
                 if minPrice in x.get_attribute("value"):
                     x.click()
                     break
-            max_price = driver.find_element_by_css_selector("select#forsale_price_max")
+            max_price = driver.find_element_by_css_selector("select#maxPrice")
             max_price.click()
             option = max_price.find_elements_by_tag_name("option")
             for x in option:
                 if maxPrice in x.get_attribute("value"):
                     x.click()
                     break
-            driver.save_screenshot('s.png')
-            btn = driver.find_element_by_css_selector("button#search-submit")
-            btn.click()
+            loc_feild = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR,"button#submit")))
+            loc_feild.click()
             print("Criteria added successfully....")
             status = True
         except Exception as ex:
@@ -248,7 +236,7 @@ class DataCrawler:
                         print("Captcha Resolved successfully..")
                         submit = driver.find_element_by_css_selector("input.touchcontactagent-button-submit")
                         submit.click()
-                        WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.lf-confirmation-heading__email-sent")))
+                        WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div#lvaEmailSentConfirmation")))
                         print("Msg sent successfully")
                         msg_status = True
             except Exception as ex:
@@ -261,29 +249,28 @@ class DataCrawler:
     def main(self, input_data):
         import pdb; pdb.set_trace()
         for x in input_data:
-            location = x['location']
-            minPrice = x['minPrice']
-            maxPrice = x['maxPrice']
-            message = x['message']
-            username = x['username']
-            password = x['password']
-            self.insert_data(username, password ,location, minPrice, maxPrice, "Starting process","0")
+            # location = x['location']
+            # minPrice = x['minPrice']
+            # maxPrice = x['maxPrice']
+            # message = x['message']
+            # username = x['username']
+            # password = x['password']
+            # self.insert_data(username, password ,location, minPrice, maxPrice, "Starting process","0")
             login = self.do_login("fixisib161@xhyemail.com", "mnbvcxz123")
             if login:
-                self.serach_location("london")
-                self.get_agents()
-                status = self.property_search(location, minPrice, maxPrice)
+                status = self.property_search("london","50000","60000")
+                # status = self.property_search(location, minPrice, maxPrice)
                 if status:
-                    self.update_data('Getting properties...', username, location, minPrice, maxPrice)
-                    all_agents = self.get_all_properties()
+                    # self.update_data('Getting properties...', username, location, minPrice, maxPrice)
+                    all_agents = self.get_agents()
                     if all_agents:
-                        self.update_data('Total properties found '+str(len(all_agents)), username, location, minPrice, maxPrice)
+                        # self.update_data('Total properties found '+str(len(all_agents)), username, location, minPrice, maxPrice)
                         print ('Total properties found '+str(len(all_agents)))
                         msg_fail = 1
                         for index, link in enumerate(all_agents):
-                            msg_status = self.send_msg_to_agent(link, message)
+                            msg_status = self.send_msg_to_agent(link, "more details")
                             if msg_status:
-                                self.update_data(str(index+1)+" of "+str(len(all_agents))+" messages sent", username, location, minPrice, maxPrice)
+                                # self.update_data(str(index+1)+" of "+str(len(all_agents))+" messages sent", username, location, minPrice, maxPrice)
                                 print (str(index+1)+" of "+str(len(all_agents))+" messages sent")
                             else:
                                 self.update_unsuccess_msg("unsuccessfull messages is "+str(msg_fail), username, location, minPrice, maxPrice)
