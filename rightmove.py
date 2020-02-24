@@ -191,8 +191,9 @@ class DataCrawler:
                 time.sleep(2)
                 next_page = driver.find_elements_by_css_selector("div.pagination-controls--disabled")
                 if next_page:
-                    if "Next" in next_page[0].text:
-                        raise Exception
+                    for x in next_page:
+                        if "Next" in x.text:
+                            raise Exception
                 print("Agents found yet::",len(agents_link))
         except Exception as ex:
             pass
@@ -210,9 +211,15 @@ class DataCrawler:
                 msg = driver.find_element_by_css_selector("textarea#comments")
                 msg.send_keys(message)
                 msg = driver.find_element_by_css_selector("input#telephone")
+                msg.clear()
                 msg.send_keys("21225458525")
                 msg = driver.find_element_by_css_selector("input#postcode")
+                msg.clear()
                 msg.send_keys("MK6 1AJ")
+                time.sleep(1)
+                driver.find_element_by_css_selector("div.manual-trigger").click()
+                msg = driver.find_element_by_css_selector("textarea#address")
+                msg.send_keys("..")
                 sell_type = driver.find_element_by_css_selector("select#emailAnswerSellSituationType")
                 options = sell_type.find_elements_by_tag_name("option")
                 if options:options[1].click()
@@ -234,9 +241,12 @@ class DataCrawler:
                             print("Captche fail..retry",c)
                             continue
                         print("Captcha Resolved successfully..")
-                        submit = driver.find_element_by_css_selector("input.touchcontactagent-button-submit")
-                        submit.click()
-                        WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div#lvaEmailSentConfirmation")))
+                        try:
+                            submit = driver.find_element_by_css_selector("input.touchcontactagent-button-submit")
+                            submit.click()
+                            WebDriverWait(driver, 12).until(EC.presence_of_element_located((By.CSS_SELECTOR,"div#lvaEmailSentConfirmation")))
+                        except:
+                            pass
                         print("Msg sent successfully")
                         msg_status = True
             except Exception as ex:
@@ -247,7 +257,6 @@ class DataCrawler:
         return msg_status
 
     def main(self, input_data):
-        import pdb; pdb.set_trace()
         for x in input_data:
             # location = x['location']
             # minPrice = x['minPrice']
@@ -256,7 +265,7 @@ class DataCrawler:
             # username = x['username']
             # password = x['password']
             # self.insert_data(username, password ,location, minPrice, maxPrice, "Starting process","0")
-            login = self.do_login("fixisib161@xhyemail.com", "mnbvcxz123")
+            login = self.do_login("andrew.sullivan@us.stores.mcd.com", "shitpassword1")
             if login:
                 status = self.property_search("london","50000","60000")
                 # status = self.property_search(location, minPrice, maxPrice)
@@ -267,24 +276,25 @@ class DataCrawler:
                         # self.update_data('Total properties found '+str(len(all_agents)), username, location, minPrice, maxPrice)
                         print ('Total properties found '+str(len(all_agents)))
                         msg_fail = 1
+                        import pdb; pdb.set_trace()
                         for index, link in enumerate(all_agents):
                             msg_status = self.send_msg_to_agent(link, "more details")
                             if msg_status:
                                 # self.update_data(str(index+1)+" of "+str(len(all_agents))+" messages sent", username, location, minPrice, maxPrice)
                                 print (str(index+1)+" of "+str(len(all_agents))+" messages sent")
                             else:
-                                self.update_unsuccess_msg("unsuccessfull messages is "+str(msg_fail), username, location, minPrice, maxPrice)
+                                # self.update_unsuccess_msg("unsuccessfull messages is "+str(msg_fail), username, location, minPrice, maxPrice)
                                 msg_fail = msg_fail + 1
                         driver.close()
                         print ('done')
                         # yield 'done'
                 else:
                     driver.close()
-                    self.update_data("error while adding criteria retry..", username, location, minPrice, maxPrice)
+                    # self.update_data("error while adding criteria retry..", username, location, minPrice, maxPrice)
                     print("error while adding criteria retry..")
             else:
                 driver.close()
-                self.update_data("error in login retry..", username, location, minPrice, maxPrice)
+                # self.update_data("error in login retry..", username, location, minPrice, maxPrice)
                 print("error in login retry..")
 
 if __name__ == "__main__":
